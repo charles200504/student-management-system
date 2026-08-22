@@ -1,7 +1,10 @@
 <?php
+require_once __DIR__ . '/functions.php';
+
 $pageTitle = $pageTitle ?? 'Student Management System';
 $basePath = $basePath ?? '';
 $activePage = $activePage ?? '';
+$user = get_logged_user();
 ?>
 <!doctype html>
 <html lang="en">
@@ -9,19 +12,44 @@ $activePage = $activePage ?? '';
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title><?= e($pageTitle) ?></title>
-    <link rel="stylesheet" href="<?= e($basePath) ?>assets/css/styles.css">
+    <link rel="stylesheet" href="<?= e($basePath) ?>assets/css/styles.css?v=<?= time() ?>">
 </head>
 <body>
 <header class="site-header">
     <div class="container header-inner">
-        <div>
-            <p class="eyebrow">PUSL2021 Coursework Project</p>
-            <h1>Student Management System</h1>
+        <div class="brand">
+            <div class="brand-logo">⚡</div>
+            <div>
+                <a href="<?= e($basePath) ?>index.php" class="brand-name">STUDENT<span>SYS</span></a>
+                <p class="brand-sub">PUSL2021 Enterprise Portal</p>
+            </div>
         </div>
         <nav class="nav">
-            <a class="<?= $activePage === 'students' ? 'active' : '' ?>"
-               href="<?= e($basePath) ?>students/index.php">Students</a>
-            <a href="<?= e($basePath) ?>students/create.php">Add Student</a>
+            <a class="<?= $activePage === 'home' ? 'active' : '' ?>" href="<?= e($basePath) ?>index.php">Home</a>
+            
+            <?php if (is_logged_in()): ?>
+                <a class="<?= $activePage === 'dashboard' ? 'active' : '' ?>" href="<?= e($basePath) ?>dashboard.php">Dashboard</a>
+                <a class="<?= $activePage === 'students' ? 'active' : '' ?>" href="<?= e($basePath) ?>students/index.php">Students</a>
+                <a class="<?= $activePage === 'courses' ? 'active' : '' ?>" href="<?= e($basePath) ?>courses/index.php">Courses</a>
+                <a class="button gold-btn-nav" href="<?= e($basePath) ?>students/create.php">➕ Register Student</a>
+                
+                <!-- Circular Avatar Profile Button -->
+                <a href="<?= e($basePath) ?>auth/profile.php" class="user-profile-badge <?= $activePage === 'profile' ? 'active' : '' ?>" title="Edit Profile">
+                    <div class="avatar-circle-wrapper">
+                        <?php if (!empty($user['avatar'])): ?>
+                            <img src="<?= e($basePath) ?>assets/uploads/<?= e($user['avatar']) ?>" alt="Avatar" class="navbar-avatar">
+                        <?php else: ?>
+                            <span class="navbar-avatar-placeholder"><?= strtoupper(substr($user['name'], 0, 1)) ?></span>
+                        <?php endif; ?>
+                    </div>
+                    <span class="user-greeting"><?= e($user['name']) ?></span>
+                </a>
+
+                <a class="button danger-btn-nav" href="<?= e($basePath) ?>auth/logout.php">Logout</a>
+            <?php else: ?>
+                <a class="<?= $activePage === 'login' ? 'active' : '' ?>" href="<?= e($basePath) ?>auth/login.php">Log In</a>
+                <a class="button gold-btn-nav" href="<?= e($basePath) ?>auth/register.php">Sign Up</a>
+            <?php endif; ?>
         </nav>
     </div>
 </header>

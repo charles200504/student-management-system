@@ -1,8 +1,9 @@
 <?php
 require_once '../config/database.php';
 require_once '../includes/functions.php';
+require_once '../includes/auth_check.php';
 
-$pageTitle = 'Students';
+$pageTitle = 'Student Directory';
 $basePath = '../';
 $activePage = 'students';
 
@@ -46,9 +47,9 @@ $stmt->execute($params);
 $students = $stmt->fetchAll();
 
 $messages = [
-    'created' => 'Student added successfully.',
-    'updated' => 'Student updated successfully.',
-    'deleted' => 'Student deleted successfully.',
+    'created' => 'Student record registered successfully.',
+    'updated' => 'Student record updated successfully.',
+    'deleted' => 'Student record deleted successfully.',
 ];
 
 require_once '../includes/header.php';
@@ -56,10 +57,13 @@ require_once '../includes/header.php';
 
 <section class="page-heading">
     <div>
-        <p class="eyebrow">Manage Records</p>
-        <h2>Students</h2>
+        <p class="eyebrow">Directory</p>
+        <h2>Enrolled Students</h2>
     </div>
-    <a class="button primary" href="create.php">Add Student</a>
+    <div class="action-buttons">
+        <a class="button secondary" href="export.php">📥 Export CSV</a>
+        <a class="button gold-btn" href="create.php">➕ Register Student</a>
+    </div>
 </section>
 
 <?php foreach ($messages as $key => $message): ?>
@@ -68,17 +72,17 @@ require_once '../includes/header.php';
     <?php endif; ?>
 <?php endforeach; ?>
 
-<section class="panel">
+<section class="panel filter-panel">
     <form class="toolbar" method="get" action="index.php">
         <label>
-            <span>Search</span>
+            <span>Search Directory</span>
             <input type="text" name="search" value="<?= e($search) ?>"
-                   placeholder="Name, student number, email, or course">
+                   placeholder="Search by name, ID, email, or course...">
         </label>
         <label>
-            <span>Status</span>
+            <span>Filter Status</span>
             <select name="status">
-                <option value="">All statuses</option>
+                <option value="">All Statuses</option>
                 <?php foreach ($allowedStatuses as $item): ?>
                     <option value="<?= e($item) ?>" <?= $status === $item ? 'selected' : '' ?>>
                         <?= e($item) ?>
@@ -86,42 +90,48 @@ require_once '../includes/header.php';
                 <?php endforeach; ?>
             </select>
         </label>
-        <button class="button" type="submit">Filter</button>
+        <button class="button primary" type="submit">Filter</button>
         <a class="button muted" href="index.php">Reset</a>
     </form>
 </section>
 
-<section class="panel">
+<section class="panel table-card">
     <?php if (!$students): ?>
-        <p class="empty">No student records found.</p>
+        <div style="padding:40px; text-align:center; color:#94a3b8;">
+            <p>🔍 No matching student records found.</p>
+        </div>
     <?php else: ?>
         <div class="table-wrapper">
             <table>
                 <thead>
                     <tr>
                         <th>Student No</th>
-                        <th>Name</th>
-                        <th>Email</th>
+                        <th>Student Name</th>
+                        <th>Email Address</th>
                         <th>Course</th>
                         <th>Status</th>
-                        <th class="actions">Actions</th>
+                        <th class="actions">Manage</th>
                     </tr>
                 </thead>
                 <tbody>
                     <?php foreach ($students as $student): ?>
                         <tr>
-                            <td><?= e($student['student_no']) ?></td>
-                            <td><?= e($student['first_name'] . ' ' . $student['last_name']) ?></td>
+                            <td><span class="badge badge-id"><?= e($student['student_no']) ?></span></td>
+                            <td><strong><?= e($student['first_name'] . ' ' . $student['last_name']) ?></strong></td>
                             <td><?= e($student['email']) ?></td>
-                            <td><?= e($student['course_code']) ?></td>
-                            <td><span class="status"><?= e($student['status']) ?></span></td>
+                            <td><span class="badge badge-course"><?= e($student['course_code']) ?></span></td>
+                            <td>
+                                <span class="badge badge-status badge-<?= strtolower(e($student['status'])) ?>">
+                                    <?= e($student['status']) ?>
+                                </span>
+                            </td>
                             <td class="actions">
-                                <a href="show.php?id=<?= e($student['id']) ?>">View</a>
-                                <a href="edit.php?id=<?= e($student['id']) ?>">Edit</a>
+                                <a class="action-btn view-btn" href="show.php?id=<?= e($student['id']) ?>">View</a>
+                                <a class="action-btn edit-btn" href="edit.php?id=<?= e($student['id']) ?>">Edit</a>
                                 <form method="post" action="delete.php"
-                                      onsubmit="return confirm('Delete this student?');">
+                                      onsubmit="return confirm('Are you sure you want to remove this record?');">
                                     <input type="hidden" name="id" value="<?= e($student['id']) ?>">
-                                    <button type="submit" class="link danger">Delete</button>
+                                    <button type="submit" class="action-btn delete-btn">Delete</button>
                                 </form>
                             </td>
                         </tr>
