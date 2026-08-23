@@ -2,7 +2,7 @@
 require_once '../config/database.php';
 require_once '../includes/functions.php';
 require_once '../includes/auth_check.php';
-require_once '../includes/ai_intelligence.php';
+require_once '../includes/academic_intelligence.php';
 
 $id = (int) ($_GET['id'] ?? 0);
 $student = $id > 0 ? find_student($pdo, $id) : null;
@@ -60,8 +60,8 @@ $modulesStmt = $pdo->prepare('SELECT * FROM student_modules WHERE student_id = :
 $modulesStmt->execute(['id' => $id]);
 $modules = $modulesStmt->fetchAll();
 
-// Generate AI Academic Intelligence Analysis
-$aiReport = generate_academic_ai_analysis($student, $modules);
+// Generate Data-Driven Academic Intelligence Analysis
+$intelReport = generate_academic_intelligence_analysis($student, $modules);
 
 $pageTitle = 'View Student Profile';
 $basePath = '../';
@@ -83,42 +83,42 @@ require_once '../includes/header.php';
 </section>
 
 <?php if (isset($_GET['gpa_updated'])): ?>
-    <div class="alert success">⚡ Cumulative GPA and AI Insights auto-recalculated!</div>
+    <div class="alert success">⚡ Cumulative GPA and Academic Intelligence auto-recalculated!</div>
 <?php endif; ?>
 
-<!-- AI-Powered Academic Intelligence Card -->
+<!-- Data-Driven Academic Intelligence Card -->
 <div class="panel" style="border: 1px solid var(--card-gold-border); background: linear-gradient(135deg, rgba(21, 29, 48, 0.9) 0%, rgba(15, 21, 35, 0.95) 100%); margin-bottom: 24px;">
     <div style="display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid var(--border); padding-bottom: 12px; margin-bottom: 16px;">
         <div style="display: flex; align-items: center; gap: 10px;">
-            <span style="font-size: 20px;">🤖</span>
-            <h3 style="font-size: 16px; color: var(--primary-gold); font-weight: 800;">AI Academic Intelligence & Prediction Engine</h3>
+            <span style="font-size: 20px;">📊</span>
+            <h3 style="font-size: 16px; color: var(--primary-gold); font-weight: 800;">Data-Driven Academic Intelligence & Predictive Engine</h3>
         </div>
         <span class="badge" style="background: rgba(245, 158, 11, 0.15); color: var(--primary-gold); border: 1px solid var(--card-gold-border);">
-            AI v2.4 Active
+            Analytics Active
         </span>
     </div>
 
     <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 16px; margin-bottom: 16px;">
         <div style="background: var(--bg-surface-elevated); padding: 14px; border-radius: 10px; border: 1px solid var(--border);">
             <div style="font-size: 11px; color: var(--text-muted); font-weight: 700; text-transform: uppercase;">Predicted Degree Class</div>
-            <div style="font-size: 16px; font-weight: 800; color: #ffffff; margin-top: 4px;"><?= e($aiReport['predicted_honor']) ?></div>
+            <div style="font-size: 16px; font-weight: 800; color: #ffffff; margin-top: 4px;"><?= e($intelReport['predicted_honor']) ?></div>
         </div>
 
         <div style="background: var(--bg-surface-elevated); padding: 14px; border-radius: 10px; border: 1px solid var(--border);">
             <div style="font-size: 11px; color: var(--text-muted); font-weight: 700; text-transform: uppercase;">Academic Risk Metric</div>
-            <div style="font-size: 16px; font-weight: 800; color: <?= e($aiReport['risk_color']) ?>; margin-top: 4px;"><?= e($aiReport['risk_level']) ?> Risk</div>
+            <div style="font-size: 16px; font-weight: 800; color: <?= e($intelReport['risk_color']) ?>; margin-top: 4px;"><?= e($intelReport['risk_level']) ?> Risk</div>
         </div>
 
         <div style="background: var(--bg-surface-elevated); padding: 14px; border-radius: 10px; border: 1px solid var(--border);">
             <div style="font-size: 11px; color: var(--text-muted); font-weight: 700; text-transform: uppercase;">Total Credits Earned</div>
-            <div style="font-size: 16px; font-weight: 800; color: #38bdf8; margin-top: 4px;"><?= e((string)$aiReport['total_credits']) ?> CATS Credits</div>
+            <div style="font-size: 16px; font-weight: 800; color: #38bdf8; margin-top: 4px;"><?= e((string)$intelReport['total_credits']) ?> CATS Credits</div>
         </div>
     </div>
 
     <div style="background: rgba(0, 0, 0, 0.2); padding: 14px; border-radius: 8px;">
-        <div style="font-size: 12px; font-weight: 700; color: var(--text-muted); margin-bottom: 6px;">AI ADVISORY INSIGHTS & REMEDIATION:</div>
+        <div style="font-size: 12px; font-weight: 700; color: var(--text-muted); margin-bottom: 6px;">ADVISORY INSIGHTS & REMEDIATION ROADMAP:</div>
         <ul style="margin-left: 20px; font-size: 13px; color: #cbd5e1; line-height: 1.6;">
-            <?php foreach ($aiReport['insights'] as $insight): ?>
+            <?php foreach ($intelReport['insights'] as $insight): ?>
                 <li><?= e($insight) ?></li>
             <?php endforeach; ?>
         </ul>

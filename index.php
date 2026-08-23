@@ -2,7 +2,7 @@
 require_once 'config/database.php';
 require_once 'includes/functions.php';
 
-$pageTitle = 'StudentSys | Next-Gen Academic Management';
+$pageTitle = 'StudentSys | Data-Driven Academic Management';
 $basePath = '';
 $activePage = 'home';
 
@@ -14,7 +14,7 @@ require_once 'includes/header.php';
     <div class="hero-badge">SRI LANKA'S #1 ACADEMIC INTELLIGENCE PLATFORM</div>
     <h1 class="hero-title">
         Next-Gen Student Management <br>
-        <span>AI-Powered Academic Intelligence</span>
+        <span>Data-Driven Academic Intelligence</span>
     </h1>
     <p class="hero-author-tag">DEVELOPED FOR PLYMOUTH UNIVERSITY / NSBM COURSEWORK</p>
 

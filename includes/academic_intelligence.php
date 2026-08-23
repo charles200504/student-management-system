@@ -1,7 +1,11 @@
 <?php
 declare(strict_types=1);
 
-function generate_academic_ai_analysis(array $student, array $modules): array
+/**
+ * Data-Driven Academic Intelligence Engine
+ * Heuristic prediction model for honor classification, credit tracking, and risk assessment.
+ */
+function generate_academic_intelligence_analysis(array $student, array $modules): array
 {
     $gpa = (float)($student['gpa'] ?? 0.0);
     $totalCredits = 0;
@@ -39,7 +43,7 @@ function generate_academic_ai_analysis(array $student, array $modules): array
         $riskColor = '#f59e0b';
     }
 
-    // 2. Automated Actionable Roadmap Insights
+    // 2. Actionable Roadmap Insights
     $insights = [];
     if ($gpa >= 3.70) {
         $insights[] = '🌟 Candidate for Faculty Dean\'s Honours and postgraduate research fellowships.';
