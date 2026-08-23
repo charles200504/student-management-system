@@ -76,8 +76,11 @@ require_once '../includes/header.php';
         <h2><?= e($student['first_name'] . ' ' . $student['last_name']) ?></h2>
     </div>
     <div class="action-buttons">
-        <a class="button secondary" href="id_card.php?id=<?= e($student['id']) ?>">🪪 Print ID Card</a>
-        <a class="button gold-btn" href="edit.php?id=<?= e($student['id']) ?>">✏️ Edit Profile</a>
+        <a class="button dark-btn" href="lms.php?id=<?= e((string)$student['id']) ?>" style="border-color: #059669; color: #34d399;">
+            🎓 Student SLearn Portal
+        </a>
+        <a class="button secondary" href="id_card.php?id=<?= e((string)$student['id']) ?>">🪪 Print ID Card</a>
+        <a class="button gold-btn" href="edit.php?id=<?= e((string)$student['id']) ?>">✏️ Edit Profile</a>
         <a class="button muted" href="index.php">Back to Directory</a>
     </div>
 </section>
@@ -206,7 +209,7 @@ require_once '../includes/header.php';
         </div>
 
         <!-- Add Module Bar -->
-        <form method="post" action="show.php?id=<?= e($student['id']) ?>" style="padding: 16px 20px; background: var(--bg-surface-elevated); border-bottom: 1px solid var(--border); display: grid; grid-template-columns: 1fr 1.3fr 75px 80px auto; gap: 8px; align-items: center;">
+        <form method="post" action="show.php?id=<?= e((string)$student['id']) ?>" style="padding: 16px 20px; background: var(--bg-surface-elevated); border-bottom: 1px solid var(--border); display: grid; grid-template-columns: 1fr 1.3fr 75px 80px auto; gap: 8px; align-items: center;">
             <input type="hidden" name="add_module" value="1">
             <input type="text" name="module_code" placeholder="Code (SE201)" required style="padding: 8px 10px; font-size: 12px;">
             <input type="text" name="module_name" placeholder="Module Title" required style="padding: 8px 10px; font-size: 12px;">
@@ -247,9 +250,9 @@ require_once '../includes/header.php';
                                 <td><?= e((string)$m['credits']) ?></td>
                                 <td>
                                     <!-- Instant Grade Change Form -->
-                                    <form method="post" action="show.php?id=<?= e($student['id']) ?>" style="display:inline-flex; align-items:center; gap:4px;">
+                                    <form method="post" action="show.php?id=<?= e((string)$student['id']) ?>" style="display:inline-flex; align-items:center; gap:4px;">
                                         <input type="hidden" name="update_grade" value="1">
-                                        <input type="hidden" name="module_id" value="<?= e($m['id']) ?>">
+                                        <input type="hidden" name="module_id" value="<?= e((string)$m['id']) ?>">
                                         <select name="grade" onchange="this.form.submit()" style="padding: 4px 6px; font-size: 12px; font-weight: bold; width: 75px;">
                                             <?php foreach (['A+', 'A', 'A-', 'B+', 'B', 'B-', 'C+', 'C', 'F'] as $gr): ?>
                                                 <option value="<?= $gr ?>" <?= $m['grade'] === $gr ? 'selected' : '' ?>><?= $gr ?></option>
@@ -258,9 +261,9 @@ require_once '../includes/header.php';
                                     </form>
                                 </td>
                                 <td>
-                                    <form method="post" action="show.php?id=<?= e($student['id']) ?>" onsubmit="return confirm('Remove module?');" style="display:inline;">
+                                    <form method="post" action="show.php?id=<?= e((string)$student['id']) ?>" onsubmit="return confirm('Remove module?');" style="display:inline;">
                                         <input type="hidden" name="delete_module" value="1">
-                                        <input type="hidden" name="module_id" value="<?= e($m['id']) ?>">
+                                        <input type="hidden" name="module_id" value="<?= e((string)$m['id']) ?>">
                                         <button type="submit" class="action-btn delete-btn" style="padding: 4px 8px; font-size: 11px;">✕</button>
                                     </form>
                                 </td>

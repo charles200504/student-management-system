@@ -31,6 +31,12 @@ $user = get_logged_user();
                 <a class="<?= $activePage === 'dashboard' ? 'active' : '' ?>" href="<?= e($basePath) ?>dashboard.php">Dashboard</a>
                 <a class="<?= $activePage === 'students' ? 'active' : '' ?>" href="<?= e($basePath) ?>students/index.php">Students</a>
                 <a class="<?= $activePage === 'courses' ? 'active' : '' ?>" href="<?= e($basePath) ?>courses/index.php">Courses</a>
+                
+                <!-- SLearn Internal LMS Gateway Link -->
+                <a class="nlearn-nav-btn <?= $activePage === 'lms' ? 'active' : '' ?>" href="<?= e($basePath) ?>students/lms.php" title="SLearn Student LMS Gateway">
+                    🎓 SLearn LMS
+                </a>
+
                 <a class="button gold-btn-nav" href="<?= e($basePath) ?>students/create.php">➕ Register Student</a>
                 
                 <!-- Circular Avatar Profile Button -->
@@ -47,6 +53,7 @@ $user = get_logged_user();
 
                 <a class="button danger-btn-nav" href="<?= e($basePath) ?>auth/logout.php">Logout</a>
             <?php else: ?>
+                <a class="nlearn-nav-btn" href="<?= e($basePath) ?>students/lms.php">🎓 SLearn LMS</a>
                 <a class="<?= $activePage === 'login' ? 'active' : '' ?>" href="<?= e($basePath) ?>auth/login.php">Log In</a>
                 <a class="button gold-btn-nav" href="<?= e($basePath) ?>auth/register.php">Sign Up</a>
             <?php endif; ?>

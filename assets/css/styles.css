@@ -121,6 +121,28 @@ a {
     background: rgba(245, 158, 11, 0.1);
 }
 
+/* SLearn LMS Gateway Navigation Button */
+.nlearn-nav-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 6px 12px !important;
+    background: rgba(16, 185, 129, 0.12) !important;
+    border: 1px solid rgba(16, 185, 129, 0.35);
+    color: #34d399 !important;
+    border-radius: 8px;
+    font-size: 13px;
+    font-weight: 700;
+    transition: all 0.2s ease;
+}
+
+.nlearn-nav-btn:hover {
+    background: rgba(16, 185, 129, 0.25) !important;
+    color: #6ee7b7 !important;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(16, 185, 129, 0.2);
+}
+
 /* User Profile Badge & Circular Avatar */
 .user-profile-badge {
     display: inline-flex;
@@ -795,9 +817,105 @@ input:focus, select:focus, textarea:focus { outline: none; border-color: var(--p
     font-size: 13px;
 }
 
+/* Moodle / SLearn Assignment Layout */
+.moodle-container {
+    max-width: 1000px;
+    margin: 0 auto;
+}
+
+.moodle-sub-nav {
+    display: flex;
+    flex-wrap: wrap;
+    background: #00705a;
+    border-radius: 8px 8px 0 0;
+    overflow: hidden;
+}
+
+.m-nav-item {
+    padding: 12px 18px;
+    color: #ffffff !important;
+    font-size: 13px;
+    font-weight: 700;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    border-right: 1px solid rgba(255, 255, 255, 0.15);
+    transition: background 0.2s ease;
+}
+
+.m-nav-item:hover,
+.m-nav-item.active {
+    background: #005847;
+}
+
+.moodle-card {
+    background: var(--bg-surface);
+    border: 1px solid var(--border);
+    border-radius: 0 0 12px 12px;
+    padding: 28px;
+}
+
+.submission-req-list ul {
+    margin-left: 22px;
+    color: #cbd5e1;
+    font-size: 14px;
+    line-height: 1.8;
+}
+
+.moodle-status-table {
+    width: 100%;
+    border-collapse: collapse;
+    background: var(--bg-surface-elevated);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    overflow: hidden;
+}
+
+.moodle-status-table tr {
+    border-bottom: 1px solid var(--border);
+}
+
+.moodle-status-table tr:last-child {
+    border-bottom: none;
+}
+
+.moodle-status-table .lbl-col {
+    width: 220px;
+    background: rgba(15, 23, 42, 0.7);
+    font-weight: 700;
+    color: var(--text-muted);
+    font-size: 13px;
+    padding: 14px 20px;
+}
+
+.moodle-status-table .val-col {
+    padding: 14px 20px;
+    font-size: 14px;
+    color: #ffffff;
+}
+
+.moodle-tag {
+    display: inline-block;
+    padding: 4px 10px;
+    border-radius: 6px;
+    font-size: 12px;
+    font-weight: 700;
+}
+
+.moodle-tag.tag-success {
+    background: rgba(16, 185, 129, 0.2);
+    color: #34d399;
+}
+
+.moodle-tag.tag-muted {
+    background: rgba(148, 163, 184, 0.12);
+    color: #94a3b8;
+}
+
 @media (max-width: 900px) { .charts-grid { grid-template-columns: 1fr; } }
 @media (max-width: 768px) {
     .header-inner, .page-heading { flex-direction: column; align-items: stretch; }
     .toolbar, .grid-2, .details dl { grid-template-columns: 1fr; }
     td.actions { flex-direction: column; }
+    .moodle-status-table .lbl-col { width: 140px; }
 }
