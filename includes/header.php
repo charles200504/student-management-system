@@ -28,27 +28,27 @@ $user = get_logged_user();
             <a class="<?= $activePage === 'home' ? 'active' : '' ?>" href="<?= e($basePath) ?>index.php">Home</a>
             
             <?php if (is_logged_in()): ?>
-                <a class="<?= $activePage === 'dashboard' ? 'active' : '' ?>" href="<?= e($basePath) ?>dashboard.php">Dashboard</a>
-                <a class="<?= $activePage === 'students' ? 'active' : '' ?>" href="<?= e($basePath) ?>students/index.php">Students</a>
-                <a class="<?= $activePage === 'courses' ? 'active' : '' ?>" href="<?= e($basePath) ?>courses/index.php">Courses</a>
+                <?php if (is_admin()): ?>
+                    <a class="<?= $activePage === 'dashboard' ? 'active' : '' ?>" href="<?= e($basePath) ?>dashboard.php">Dashboard</a>
+                    <a class="<?= $activePage === 'students' ? 'active' : '' ?>" href="<?= e($basePath) ?>students/index.php">Students</a>
+                    <a class="<?= $activePage === 'courses' ? 'active' : '' ?>" href="<?= e($basePath) ?>courses/index.php">Courses</a>
+                    <a class="nlearn-nav-btn <?= $activePage === 'lms' ? 'active' : '' ?>" href="<?= e($basePath) ?>students/lms.php">🎓 SLearn LMS</a>
+                    <a class="button gold-btn-nav" href="<?= e($basePath) ?>students/create.php">➕ Register Student</a>
+                <?php else: ?>
+                    <a class="<?= $activePage === 'profile_view' ? 'active' : '' ?>" href="<?= e($basePath) ?>students/my_profile.php">👤 My Profile</a>
+                    <a class="nlearn-nav-btn <?= $activePage === 'lms' ? 'active' : '' ?>" href="<?= e($basePath) ?>students/lms.php">🎓 My SLearn LMS</a>
+                    <a class="<?= $activePage === 'id_card' ? 'active' : '' ?>" href="<?= e($basePath) ?>students/my_id_card.php">🪪 My Student ID</a>
+                <?php endif; ?>
                 
-                <!-- SLearn Internal LMS Gateway Link -->
-                <a class="nlearn-nav-btn <?= $activePage === 'lms' ? 'active' : '' ?>" href="<?= e($basePath) ?>students/lms.php" title="SLearn Student LMS Gateway">
-                    🎓 SLearn LMS
-                </a>
-
-                <a class="button gold-btn-nav" href="<?= e($basePath) ?>students/create.php">➕ Register Student</a>
-                
-                <!-- Circular Avatar Profile Button -->
                 <a href="<?= e($basePath) ?>auth/profile.php" class="user-profile-badge <?= $activePage === 'profile' ? 'active' : '' ?>" title="Edit Profile">
                     <div class="avatar-circle-wrapper">
                         <?php if (!empty($user['avatar'])): ?>
                             <img src="<?= e($basePath) ?>assets/uploads/<?= e($user['avatar']) ?>" alt="Avatar" class="navbar-avatar">
                         <?php else: ?>
-                            <span class="navbar-avatar-placeholder"><?= strtoupper(substr($user['name'], 0, 1)) ?></span>
+                            <span class="navbar-avatar-placeholder"><?= strtoupper(substr($user['name'] ?? 'U', 0, 1)) ?></span>
                         <?php endif; ?>
                     </div>
-                    <span class="user-greeting"><?= e($user['name']) ?></span>
+                    <span class="user-greeting"><?= e($user['name'] ?? 'User') ?> (<?= ucfirst(e($user['role'] ?? 'student')) ?>)</span>
                 </a>
 
                 <a class="button danger-btn-nav" href="<?= e($basePath) ?>auth/logout.php">Logout</a>

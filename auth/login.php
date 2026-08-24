@@ -2,24 +2,10 @@
 require_once '../config/database.php';
 require_once '../includes/functions.php';
 
+$errors = [];
+
 if (is_logged_in()) {
-    redirect('../index.php');
-}
-
-$pageTitle = 'Login - Student Management System';
-$basePath = '../';
-$activePage = 'login';
-$error = '';
-$success = '';
-
-if (isset($_GET['registered'])) {
-    $success = 'Account created successfully! You can now log in.';
-}
-if (isset($_GET['reset'])) {
-    $success = 'Password has been updated. Please log in with your new password.';
-}
-if (isset($_GET['error']) && $_GET['error'] === 'unauthorized') {
-    $error = 'Please log in to access this portal section.';
+    redirect('../dashboard.php');
 }
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
@@ -27,23 +13,38 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $password = (string)($_POST['password'] ?? '');
 
     if ($email === '' || $password === '') {
-        $error = 'Please enter both email and password.';
+        $errors[] = 'Please enter both your email address and password.';
     } else {
         $stmt = $pdo->prepare('SELECT * FROM users WHERE email = :email LIMIT 1');
         $stmt->execute(['email' => $email]);
         $user = $stmt->fetch();
 
         if ($user && password_verify($password, $user['password'])) {
-            $_SESSION['user_id'] = $user['id'];
-            $_SESSION['user_name'] = $user['name'];
-            $_SESSION['user_email'] = $user['email'];
-            $_SESSION['user_avatar'] = $user['avatar'] ?? '';
-            redirect('../index.php');
+            // Set session with role
+            $_SESSION['user_id'] = (int)$user['id'];
+            $_SESSION['user'] = [
+                'id' => (int)$user['id'],
+                'name' => $user['name'],
+                'email' => $user['email'],
+                'avatar' => $user['avatar'] ?? null,
+                'role' => $user['role'] ?? 'student'
+            ];
+
+            // Role-based routing
+            if (($user['role'] ?? 'student') === 'admin') {
+                redirect('../dashboard.php');
+            } else {
+                redirect('../students/my_profile.php');
+            }
         } else {
-            $error = 'Invalid email or password credentials.';
+            $errors[] = 'Invalid email address or password combination.';
         }
     }
 }
+
+$pageTitle = 'Sign In - StudentSys';
+$basePath = '../';
+$activePage = 'login';
 
 require_once '../includes/header.php';
 ?>
@@ -51,37 +52,35 @@ require_once '../includes/header.php';
 <div class="auth-container">
     <div class="auth-card">
         <div class="auth-header">
-            <h2>Welcome Back</h2>
-            <p>Enter your credentials to access the academic control console</p>
+            <div class="brand-logo" style="margin: 0 auto 12px; width: 44px; height: 44px; font-size: 22px;">⚡</div>
+            <h2>Sign In to Portal</h2>
+            <p>Access your administrative or student academic workspace</p>
         </div>
 
-        <?php if ($error): ?>
-            <div class="alert error"><?= e($error) ?></div>
-        <?php endif; ?>
-
-        <?php if ($success): ?>
-            <div class="alert success"><?= e($success) ?></div>
+        <?php if ($errors): ?>
+            <div class="alert error" style="margin-bottom: 16px;">
+                <?php foreach ($errors as $err): ?>
+                    <div>• <?= e($err) ?></div>
+                <?php endforeach; ?>
+            </div>
         <?php endif; ?>
 
         <form method="post" action="login.php" class="auth-form">
-            <div class="form-group">
-                <label for="email_input">Email Address</label>
-                <input id="email_input" type="email" name="email" placeholder="admin@example.com" required autocomplete="username">
-            </div>
+            <label>
+                <span>Institutional / Account Email</span>
+                <input type="email" name="email" placeholder="e.g. admin@nsbm.ac.lk or student@nsbm.ac.lk" value="<?= e($_POST['email'] ?? '') ?>" required autofocus>
+            </label>
 
-            <div class="form-group">
-                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:6px;">
-                    <label for="password_input" style="margin-bottom:0;">Password</label>
-                    <a href="forgot-password.php" class="auth-link">Forgot Password?</a>
-                </div>
-                <input id="password_input" type="password" name="password" placeholder="••••••••" required autocomplete="current-password">
-            </div>
+            <label>
+                <span>Password</span>
+                <input type="password" name="password" placeholder="••••••••" required>
+            </label>
 
-            <button type="submit" class="button gold-btn auth-submit">Log In</button>
+            <button type="submit" class="button gold-btn auth-submit">Sign In</button>
         </form>
 
         <div class="auth-footer">
-            <p>Don't have an account? <a href="register.php" class="auth-link-bold">Create Account</a></p>
+            Don't have an account? <a href="register.php" class="auth-link-bold">Sign Up here</a>
         </div>
     </div>
 </div>

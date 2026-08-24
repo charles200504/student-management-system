@@ -11,8 +11,9 @@ if (!$student) {
     redirect('index.php');
 }
 
-// 1. Handle adding a new module
+// Admin-only module additions
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['add_module'])) {
+    require_admin();
     $mCode = strtoupper(trim((string)$_POST['module_code']));
     $mName = trim((string)$_POST['module_name']);
     $mGrade = trim((string)$_POST['grade']);
@@ -32,8 +33,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['add_module'])) {
     }
 }
 
-// 2. Handle updating a single module grade
+// Admin-only module grade updates
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['update_grade'])) {
+    require_admin();
     $moduleId = (int)$_POST['module_id'];
     $newGrade = trim((string)$_POST['grade']);
     
@@ -44,8 +46,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['update_grade'])) {
     redirect("show.php?id=$id&gpa_updated=1");
 }
 
-// 3. Handle deleting a module
+// Admin-only module deletions
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['delete_module'])) {
+    require_admin();
     $moduleId = (int)$_POST['module_id'];
     $del = $pdo->prepare('DELETE FROM student_modules WHERE id = :mid AND student_id = :sid');
     $del->execute(['mid' => $moduleId, 'sid' => $id]);
@@ -54,18 +57,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['delete_module'])) {
     redirect("show.php?id=$id&gpa_updated=1");
 }
 
-// Re-fetch updated student record & modules
 $student = find_student($pdo, $id);
 $modulesStmt = $pdo->prepare('SELECT * FROM student_modules WHERE student_id = :id ORDER BY id DESC');
 $modulesStmt->execute(['id' => $id]);
 $modules = $modulesStmt->fetchAll();
 
-// Generate Data-Driven Academic Intelligence Analysis
 $intelReport = generate_academic_intelligence_analysis($student, $modules);
 
 $pageTitle = 'View Student Profile';
 $basePath = '../';
-$activePage = 'students';
+$activePage = is_admin() ? 'students' : 'profile_view';
 
 require_once '../includes/header.php';
 ?>
@@ -80,8 +81,10 @@ require_once '../includes/header.php';
             🎓 Student SLearn Portal
         </a>
         <a class="button secondary" href="id_card.php?id=<?= e((string)$student['id']) ?>">🪪 Print ID Card</a>
-        <a class="button gold-btn" href="edit.php?id=<?= e((string)$student['id']) ?>">✏️ Edit Profile</a>
-        <a class="button muted" href="index.php">Back to Directory</a>
+        <?php if (is_admin()): ?>
+            <a class="button gold-btn" href="edit.php?id=<?= e((string)$student['id']) ?>">✏️ Edit Profile</a>
+            <a class="button muted" href="index.php">Back to Directory</a>
+        <?php endif; ?>
     </div>
 </section>
 
@@ -89,7 +92,6 @@ require_once '../includes/header.php';
     <div class="alert success">⚡ Cumulative GPA and Academic Intelligence auto-recalculated!</div>
 <?php endif; ?>
 
-<!-- Data-Driven Academic Intelligence Card -->
 <div class="panel" style="border: 1px solid var(--card-gold-border); background: linear-gradient(135deg, rgba(21, 29, 48, 0.9) 0%, rgba(15, 21, 35, 0.95) 100%); margin-bottom: 24px;">
     <div style="display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid var(--border); padding-bottom: 12px; margin-bottom: 16px;">
         <div style="display: flex; align-items: center; gap: 10px;">
@@ -128,7 +130,6 @@ require_once '../includes/header.php';
     </div>
 </div>
 
-<!-- Student Header Card -->
 <div class="panel" style="display: flex; align-items: center; gap: 24px; margin-bottom: 24px;">
     <?php if (!empty($student['profile_pic'])): ?>
         <img src="../assets/uploads/<?= e($student['profile_pic']) ?>" alt="Student Photo" style="width: 90px; height: 90px; border-radius: 50%; object-fit: cover; border: 2px solid var(--primary-gold);">
@@ -148,7 +149,6 @@ require_once '../includes/header.php';
     </div>
 </div>
 
-<!-- Academic KPI Dashboard -->
 <section class="stats-grid" style="margin-bottom: 24px;">
     <div class="stat-card">
         <div class="stat-icon-wrap" style="color: #f59e0b; background: rgba(245, 158, 11, 0.1);">📚</div>
@@ -175,10 +175,7 @@ require_once '../includes/header.php';
     </div>
 </section>
 
-<!-- 2-Column Split: Demographics vs Modules Table -->
 <div style="display: grid; grid-template-columns: 1fr 1.4fr; gap: 24px;">
-    
-    <!-- Left Column: Personal Record -->
     <section class="panel details">
         <h3 style="font-size: 16px; margin-bottom: 16px; color: var(--primary-gold);">👤 Personal Record</h3>
         <dl>
@@ -202,31 +199,31 @@ require_once '../includes/header.php';
         </dl>
     </section>
 
-    <!-- Right Column: Interactive Modules & Auto GPA recalculator -->
     <section class="panel table-card">
         <div class="panel-header-flex">
             <h3>📖 Enrolled Modules & Grades</h3>
         </div>
 
-        <!-- Add Module Bar -->
-        <form method="post" action="show.php?id=<?= e((string)$student['id']) ?>" style="padding: 16px 20px; background: var(--bg-surface-elevated); border-bottom: 1px solid var(--border); display: grid; grid-template-columns: 1fr 1.3fr 75px 80px auto; gap: 8px; align-items: center;">
-            <input type="hidden" name="add_module" value="1">
-            <input type="text" name="module_code" placeholder="Code (SE201)" required style="padding: 8px 10px; font-size: 12px;">
-            <input type="text" name="module_name" placeholder="Module Title" required style="padding: 8px 10px; font-size: 12px;">
-            <input type="number" name="credits" value="20" placeholder="Credits" required style="padding: 8px 10px; font-size: 12px;">
-            <select name="grade" style="padding: 8px 8px; font-size: 12px;">
-                <option value="A+">A+ (4.0)</option>
-                <option value="A">A (4.0)</option>
-                <option value="A-">A- (3.7)</option>
-                <option value="B+">B+ (3.3)</option>
-                <option value="B">B (3.0)</option>
-                <option value="B-">B- (2.7)</option>
-                <option value="C+">C+ (2.3)</option>
-                <option value="C">C (2.0)</option>
-                <option value="F">F (0.0)</option>
-            </select>
-            <button type="submit" class="button gold-btn" style="padding: 8px 12px; font-size: 12px;">+ Add</button>
-        </form>
+        <?php if (is_admin()): ?>
+            <form method="post" action="show.php?id=<?= e((string)$student['id']) ?>" style="padding: 16px 20px; background: var(--bg-surface-elevated); border-bottom: 1px solid var(--border); display: grid; grid-template-columns: 1fr 1.3fr 75px 80px auto; gap: 8px; align-items: center;">
+                <input type="hidden" name="add_module" value="1">
+                <input type="text" name="module_code" placeholder="Code (SE201)" required style="padding: 8px 10px; font-size: 12px;">
+                <input type="text" name="module_name" placeholder="Module Title" required style="padding: 8px 10px; font-size: 12px;">
+                <input type="number" name="credits" value="20" placeholder="Credits" required style="padding: 8px 10px; font-size: 12px;">
+                <select name="grade" style="padding: 8px 8px; font-size: 12px;">
+                    <option value="A+">A+ (4.0)</option>
+                    <option value="A">A (4.0)</option>
+                    <option value="A-">A- (3.7)</option>
+                    <option value="B+">B+ (3.3)</option>
+                    <option value="B">B (3.0)</option>
+                    <option value="B-">B- (2.7)</option>
+                    <option value="C+">C+ (2.3)</option>
+                    <option value="C">C (2.0)</option>
+                    <option value="F">F (0.0)</option>
+                </select>
+                <button type="submit" class="button gold-btn" style="padding: 8px 12px; font-size: 12px;">+ Add</button>
+            </form>
+        <?php endif; ?>
 
         <div class="table-wrapper">
             <table>
@@ -236,12 +233,14 @@ require_once '../includes/header.php';
                         <th>Module</th>
                         <th>Credits</th>
                         <th>Grade</th>
-                        <th>Action</th>
+                        <?php if (is_admin()): ?>
+                            <th>Action</th>
+                        <?php endif; ?>
                     </tr>
                 </thead>
                 <tbody>
                     <?php if (!$modules): ?>
-                        <tr><td colspan="5" style="text-align: center; color: var(--text-muted);">No academic modules recorded yet.</td></tr>
+                        <tr><td colspan="<?= is_admin() ? '5' : '4' ?>" style="text-align: center; color: var(--text-muted);">No academic modules recorded yet.</td></tr>
                     <?php else: ?>
                         <?php foreach ($modules as $m): ?>
                             <tr>
@@ -249,24 +248,29 @@ require_once '../includes/header.php';
                                 <td><strong><?= e($m['module_name']) ?></strong></td>
                                 <td><?= e((string)$m['credits']) ?></td>
                                 <td>
-                                    <!-- Instant Grade Change Form -->
-                                    <form method="post" action="show.php?id=<?= e((string)$student['id']) ?>" style="display:inline-flex; align-items:center; gap:4px;">
-                                        <input type="hidden" name="update_grade" value="1">
-                                        <input type="hidden" name="module_id" value="<?= e((string)$m['id']) ?>">
-                                        <select name="grade" onchange="this.form.submit()" style="padding: 4px 6px; font-size: 12px; font-weight: bold; width: 75px;">
-                                            <?php foreach (['A+', 'A', 'A-', 'B+', 'B', 'B-', 'C+', 'C', 'F'] as $gr): ?>
-                                                <option value="<?= $gr ?>" <?= $m['grade'] === $gr ? 'selected' : '' ?>><?= $gr ?></option>
-                                            <?php endforeach; ?>
-                                        </select>
-                                    </form>
+                                    <?php if (is_admin()): ?>
+                                        <form method="post" action="show.php?id=<?= e((string)$student['id']) ?>" style="display:inline-flex; align-items:center; gap:4px;">
+                                            <input type="hidden" name="update_grade" value="1">
+                                            <input type="hidden" name="module_id" value="<?= e((string)$m['id']) ?>">
+                                            <select name="grade" onchange="this.form.submit()" style="padding: 4px 6px; font-size: 12px; font-weight: bold; width: 75px;">
+                                                <?php foreach (['A+', 'A', 'A-', 'B+', 'B', 'B-', 'C+', 'C', 'F'] as $gr): ?>
+                                                    <option value="<?= $gr ?>" <?= $m['grade'] === $gr ? 'selected' : '' ?>><?= $gr ?></option>
+                                                <?php endforeach; ?>
+                                            </select>
+                                        </form>
+                                    <?php else: ?>
+                                        <span class="badge badge-active"><?= e($m['grade']) ?></span>
+                                    <?php endif; ?>
                                 </td>
-                                <td>
-                                    <form method="post" action="show.php?id=<?= e((string)$student['id']) ?>" onsubmit="return confirm('Remove module?');" style="display:inline;">
-                                        <input type="hidden" name="delete_module" value="1">
-                                        <input type="hidden" name="module_id" value="<?= e((string)$m['id']) ?>">
-                                        <button type="submit" class="action-btn delete-btn" style="padding: 4px 8px; font-size: 11px;">✕</button>
-                                    </form>
-                                </td>
+                                <?php if (is_admin()): ?>
+                                    <td>
+                                        <form method="post" action="show.php?id=<?= e((string)$student['id']) ?>" onsubmit="return confirm('Remove module?');" style="display:inline;">
+                                            <input type="hidden" name="delete_module" value="1">
+                                            <input type="hidden" name="module_id" value="<?= e((string)$m['id']) ?>">
+                                            <button type="submit" class="action-btn delete-btn" style="padding: 4px 8px; font-size: 11px;">✕</button>
+                                        </form>
+                                    </td>
+                                <?php endif; ?>
                             </tr>
                         <?php endforeach; ?>
                     <?php endif; ?>
@@ -274,7 +278,6 @@ require_once '../includes/header.php';
             </table>
         </div>
     </section>
-
 </div>
 
 <?php require_once '../includes/footer.php'; ?>
